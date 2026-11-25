@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blackjack</title>
+<style>
+*{box-sizing:border-box}
+:root{--gold:#d9b25f;--cw:clamp(52px,11.5vw,86px);--chip:clamp(50px,13vw,66px)}
+html,body{margin:0;height:100%}
+[hidden]{display:none!important}
+body{background:radial-gradient(circle at 50% 0,#2a1d12,#100c08 70%);color:#f3e7cf;font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.app{max-width:1000px;height:100dvh;margin:0 auto;padding:10px;display:flex;flex-direction:column;gap:10px}
+header{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+h1{margin:0 auto 0 0;font:italic 700 clamp(1.5rem,5vw,2.1rem) Georgia,"Times New Roman",serif;color:var(--gold)}
+.stat{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1;font-size:.75rem;color:#bfae8c}
+.stat b{font:700 1.25rem system-ui;color:#fff;font-variant-numeric:tabular-nums}
+button{font:600 1rem system-ui;min-height:44px;min-width:44px;padding:.5em 1.3em;border-radius:10px;border:1px solid #6b5636;background:#2a2118;color:#f3e7cf;cursor:pointer;transition:transform .12s,background .12s}
+button:hover:not(:disabled){background:#3a2d1f;transform:translateY(-1px)}
+button:disabled{opacity:.38;cursor:not-allowed}
+button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+button.primary{background:var(--gold);border-color:#f0d58f;color:#241a08}
+button.primary:hover:not(:disabled){background:#e6c273}
+.table{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-between;padding:14px 10px;border-radius:30px;border:10px solid #3b2212;overflow:auto;background:radial-gradient(ellipse at 50% 45%,#13854f,#0c5c39 55%,#06361f);box-shadow:inset 0 0 0 2px rgba(217,178,95,.45),inset 0 0 90px rgba(0,0,0,.55),0 18px 40px rgba(0,0,0,.6)}
+.table::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.12;mix-blend-mode:overlay;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.zone{display:flex;flex-direction:column;align-items:center;gap:8px}
+.lbl{font:italic 1rem Georgia,serif;color:rgba(243,231,207,.7)}
+.hands{display:flex;justify-content:center;flex-wrap:wrap;gap:clamp(10px,3vw,34px);min-height:calc(var(--cw)*1.4 + 44px)}
+.hands:empty::after{content:attr(data-empty);align-self:center;font:italic 1rem Georgia,serif;color:rgba(243,231,207,.6);text-align:center;padding:0 12px}
+.hand{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 8px;border-radius:14px;border:2px solid transparent;transition:border-color .2s,background .2s}
+.hand.active{border-color:var(--gold);background:rgba(0,0,0,.18)}
+.cards{display:flex;min-height:calc(var(--cw)*1.4)}
+.card{width:var(--cw);aspect-ratio:5/7;perspective:700px;animation:deal .45s cubic-bezier(.2,.8,.2,1) both}
+.card+.card{margin-left:calc(var(--cw)*-.5)}
+@keyframes deal{from{transform:translate(30vw,-40vh) rotate(18deg) scale(.8);opacity:0}to{transform:none;opacity:1}}
+.inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s}
+.card.up .inner{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;border-radius:calc(var(--cw)*.09);-webkit-backface-visibility:hidden;backface-visibility:hidden;box-shadow:0 2px 7px rgba(0,0,0,.5)}
+.front{background:#fbf8f0;color:#16130f;transform:rotateY(180deg)}
+.front.red{color:#b3261e}
+.back{background:repeating-linear-gradient(45deg,#7a1f2b 0 6px,#611824 6px 12px);box-shadow:inset 0 0 0 4px #fbf8f0,0 2px 7px rgba(0,0,0,.5)}
+.cn{position:absolute;font:700 calc(var(--cw)*.24)/1 Georgia,serif;text-align:center}
+.tl{top:6%;left:8%}
+.br{bottom:6%;right:8%;transform:rotate(180deg)}
+.pip{position:absolute;inset:0;display:grid;place-items:center;font:calc(var(--cw)*.52)/1 Georgia,serif}
+.info{display:flex;align-items:center;gap:6px;min-height:28px}
+.tot{background:rgba(0,0,0,.5);border-radius:999px;padding:2px 12px;font:600 .95rem system-ui;min-width:2.2ch;text-align:center}
+.tot.bust{background:#b3261e}
+.bt{background:var(--gold);color:#241a08;border-radius:999px;padding:2px 10px;font:700 .85rem system-ui}
+.bt:empty{display:none}
+.badge{padding:2px 10px;border-radius:6px;font:800 .8rem system-ui;color:#fff}
+.badge.win{background:#1f9d55}.badge.lose,.badge.bust{background:#b3261e}.badge.push{background:#6b7280}.badge.blackjack{background:var(--gold);color:#241a08}
+.center{position:relative;min-height:90px;display:grid;place-items:center;text-align:center}
+.rule{margin:0;font:italic .95rem Georgia,serif;color:rgba(217,178,95,.8)}
+.banner{--b:var(--gold);position:absolute;left:50%;top:50%;z-index:3;transform:translate(-50%,-50%) scale(.7);opacity:0;pointer-events:none;padding:8px 26px;border-radius:14px;border:2px solid var(--b);background:rgba(10,12,10,.88);font:700 clamp(1.3rem,5vw,2.3rem)/1.15 Georgia,serif;white-space:nowrap;transition:opacity .25s,transform .35s cubic-bezier(.2,1.4,.4,1)}
+.banner.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.banner small{display:block;font:600 .9rem system-ui;color:#d8cdb4}
+.banner.win{--b:#2fbf71}.banner.lose,.banner.bust{--b:#e5484d}.banner.push{--b:#9ca3af}.banner.blackjack{--b:#f0c860}
+.banner.blackjack{color:#f0c860}.banner.win{color:#7ee2a8}.banner.lose,.banner.bust{color:#ff8a8e}
+.controls{display:flex;justify-content:center;padding-bottom:max(4px,env(safe-area-inset-bottom))}
+.panel{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%}
+.row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.chips{display:flex;gap:clamp(8px,2.5vw,18px);justify-content:center}
+.chip{--c:#2f5fb3;width:var(--chip);height:var(--chip);min-height:0;min-width:0;padding:0;border:0;border-radius:50%;position:relative;background:repeating-conic-gradient(#f5f1e6 0 15deg,var(--c) 15deg 45deg);box-shadow:0 4px 8px rgba(0,0,0,.5)}
+.chip:hover:not(:disabled){background:repeating-conic-gradient(#f5f1e6 0 15deg,var(--c) 15deg 45deg);transform:translateY(-4px)}
+.chip::before{content:"";position:absolute;inset:15%;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)}
+.chip span{position:relative;z-index:1;color:#fff;font:700 calc(var(--chip)*.27) system-ui}
+.chip:disabled{filter:grayscale(.8)}
+.c25{--c:#b3261e}.c50{--c:#d9822b}.c100{--c:#1b1b1b}
+@media(prefers-reduced-motion:reduce){.card{animation:none}.inner,.banner{transition:none}}
+@media(max-width:520px){.app{padding:6px}.table{border-width:6px;padding:10px 4px}button{padding:.5em 1em}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Blackjack</h1>
+    <div class="stat">Bet<b id="bet">$0</b></div>
+    <div class="stat">Bankroll<b id="bank">$1,000</b></div>
+    <button id="mute" aria-pressed="false" title="Toggle sound">🔊 Sound</button>
+  </header>
+  <main class="table">
+    <section class="zone"><div class="lbl">Dealer</div><div class="hands" id="dealerHands"></div></section>
+    <div class="center">
+      <p class="rule">Blackjack pays 3 to 2 · Dealer stands on 17</p>
+      <div class="banner" id="banner" role="status" aria-live="polite"></div>
+    </div>
+    <section class="zone"><div class="hands" id="playerHands" data-empty="Click chips to place your bet, then press Deal."></div><div class="lbl">You</div></section>
+  </main>
+  <footer class="controls">
+    <div class="panel" id="betPanel">
+      <div class="chips">
+        <button class="chip c10" data-v="10" aria-label="Bet $10"><span>$10</span></button>
+        <button class="chip c25" data-v="25" aria-label="Bet $25"><span>$25</span></button>
+        <button class="chip c50" data-v="50" aria-label="Bet $50"><span>$50</span></button>
+        <button class="chip c100" data-v="100" aria-label="Bet $100"><span>$100</span></button>
+      </div>
+      <div class="row"><button id="clear">Clear Bet</button><button id="deal" class="primary">Deal</button></div>
+    </div>
+    <div class="panel row" id="actPanel" hidden>
+      <button id="hit" title="Hit (H)">Hit</button>
+      <button id="stand" title="Stand (S)">Stand</button>
+      <button id="dbl" title="Double Down (D)">Double Down</button>
+      <button id="split" title="Split (P)">Split</button>
+    </div>
+    <div class="panel row" id="overPanel" hidden>
+      <button id="newRound" class="primary">New Round</button>
+      <button id="reset" hidden>Reset Bankroll</button>
+    </div>
+  </footer>
+</div>
+<script>
+(()=>{
+const SU=['♠','♥','♦','♣'],RK=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const $=id=>document.getElementById(id);
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(n)?0:2,maximumFractionDigits:2});
+let shoe=[],bank=1000,bet=0,hands=[],dealer=null,ai=0,phase='bet',busy=false,muted=false;
+
+/* ---------- Sound (Web Audio) ---------- */
+let ac=null;
+function A(){if(muted)return null;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();}catch(e){return null}return ac}
+function tone(f,d,o={}){const a=A();if(!a)return;const t=a.currentTime+(o.at||0),os=a.createOscillator(),g=a.createGain();
+  os.type=o.type||'sine';os.frequency.setValueAtTime(f,t);if(o.to)os.frequency.exponentialRampToValueAtTime(o.to,t+d);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(o.v||.07,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  os.connect(g);g.connect(a.destination);os.start(t);os.stop(t+d+.02)}
+function noise(d,f,v){const a=A();if(!a)return;const n=a.sampleRate*d|0,b=a.createBuffer(1,n,a.sampleRate),x=b.getChannelData(0);
+  for(let i=0;i<n;i++)x[i]=(Math.random()*2-1)*(1-i/n);
+  const s=a.createBufferSource(),fl=a.createBiquadFilter(),g=a.createGain();s.buffer=b;fl.type='bandpass';fl.frequency.value=f;g.gain.value=v;
+  s.connect(fl);fl.connect(g);g.connect(a.destination);s.start()}
+const arp=(fs,v)=>fs.forEach((f,i)=>tone(f,.25,{at:i*.09,v,type:'triangle'}));
+const S={deal:()=>noise(.08,2200,.2),flip:()=>noise(.12,1500,.18),
+  chip:()=>{tone(1800,.05,{type:'square',v:.025});tone(1200,.07,{type:'square',v:.025,at:.03})},
+  win:()=>arp([523,659,784,1047],.06),blackjack:()=>arp([523,659,784,1047,1319,1568],.07),
+  lose:()=>tone(220,.45,{type:'sawtooth',to:110,v:.045}),
+  push:()=>{tone(440,.15,{v:.05});tone(440,.15,{at:.18,v:.05})}};
+const sfx=n=>S[n]&&S[n]();
+
+/* ---------- Cards ---------- */
+const pts=c=>c.r===0?11:c.r>=9?10:c.r+1;
+function total(cs){let t=0,a=0;for(const c of cs){t+=pts(c);if(c.r===0)a++}while(t>21&&a){t-=10;a--}return{t,soft:a>0}}
+function newShoe(){shoe=[];for(let d=0;d<4;d++)for(let s=0;s<4;s++)for(let r=0;r<13;r++)shoe.push({r,s});
+  for(let i=shoe.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shoe[i],shoe[j]]=[shoe[j],shoe[i]]}}
+function cardEl(c,down){const d=document.createElement('div'),r=RK[c.r],s=SU[c.s];d.className='card'+(down?'':' up');
+  d.innerHTML=`<div class="inner"><div class="face front${c.s===1||c.s===2?' red':''}"><span class="cn tl">${r}<br>${s}</span><span class="pip">${c.r>=10?r:s}</span><span class="cn br">${r}<br>${s}</span></div><div class="face back"></div></div>`;
+  return d}
+
+/* ---------- Hands ---------- */
+function mkHand(container,b){const el=document.createElement('div');el.className='hand';
+  el.innerHTML='<div class="cards"></div><div class="info"><span class="tot"></span><span class="bt"></span><span class="badge" hidden></span></div>';
+  const h={cards:[],bet:b,done:false,bust:false,hidden:false,el,cardsEl:el.querySelector('.cards'),totEl:el.querySelector('.tot'),btEl:el.querySelector('.bt'),badge:el.querySelector('.badge')};
+  container.appendChild(el);return h}
+function refresh(h){const vis=h.hidden?h.cards.slice(0,1):h.cards,{t,soft}=total(vis);
+  h.totEl.textContent=vis.length?(soft&&t<21&&vis.length>1?'Soft '+t:t):'';
+  h.totEl.classList.toggle('bust',t>21);h.btEl.textContent=h.bet?fmt(h.bet):''}
+async function give(h,down){const c=shoe.pop(),el=cardEl(c,down);h.cards.push(c);h.cardsEl.appendChild(el);
+  if(down)h.holeEl=el;sfx('deal');refresh(h);await sleep(380)}
+
+/* ---------- UI state ---------- */
+function ui(){
+  const cur=hands[ai],can=phase==='play'&&!busy&&cur&&!cur.done,two=can&&cur.cards.length===2;
+  $('bank').textContent=fmt(bank);
+  $('bet').textContent=fmt(phase==='bet'?bet:hands.reduce((s,h)=>s+h.bet,0));
+  $('betPanel').hidden=phase!=='bet';
+  $('actPanel').hidden=!(phase==='play'||phase==='dealer');
+  $('overPanel').hidden=phase!=='over';
+  document.querySelectorAll('.chip').forEach(b=>b.disabled=busy||bank<+b.dataset.v);
+  $('clear').disabled=$('deal').disabled=busy||bet<=0;
+  $('hit').disabled=$('stand').disabled=!can;
+  $('dbl').disabled=!(two&&bank>=cur.bet);
+  $('split').disabled=!(two&&pts(cur.cards[0])===pts(cur.cards[1])&&hands.length<4&&bank>=cur.bet);
+  $('newRound').disabled=busy||bank<10;
+  $('reset').hidden=bank>=10;
+  hands.forEach((h,i)=>h.el.classList.toggle('active',hands.length>1&&phase==='play'&&i===ai));
+}
+function clearTable(){$('playerHands').innerHTML='';$('dealerHands').innerHTML='';hands=[];dealer=null;ai=0;$('banner').className='banner'}
+
+/* ---------- Betting ---------- */
+function addBet(v){if(phase!=='bet'||busy||bank<v)return;bank-=v;bet+=v;sfx('chip');ui()}
+function clearBet(){if(phase!=='bet'||busy||!bet)return;bank+=bet;bet=0;sfx('chip');ui()}
+
+/* ---------- Round flow ---------- */
+async function deal(){
+  if(phase!=='bet'||busy||bet<=0)return;
+  busy=true;if(shoe.length<60)newShoe();clearTable();phase='play';
+  const p=mkHand($('playerHands'),bet);hands=[p];dealer=mkHand($('dealerHands'),0);dealer.hidden=true;ui();
+  await give(p);await give(dealer);await give(p);await give(dealer,true);
+  if(total(p.cards).t===21||total(dealer.cards).t===21){await reveal();p.done=true;settle();return}
+  busy=false;ui();
+}
+async function reveal(){dealer.hidden=false;dealer.holeEl.classList.add('up');sfx('flip');refresh(dealer);await sleep(600)}
+function nextHand(){while(hands[ai]&&hands[ai].done)ai++;if(ai>=hands.length)dealerTurn();else{busy=false;ui()}}
+async function hit(){const h=hands[ai];if(phase!=='play'||busy||!h||h.done)return;
+  busy=true;ui();await give(h);const t=total(h.cards).t;
+  if(t>21){h.bust=true;h.done=true}else if(t===21)h.done=true;nextHand()}
+function stand(){const h=hands[ai];if(phase!=='play'||busy||!h||h.done)return;h.done=true;nextHand()}
+async function dbl(){const h=hands[ai];if(!(phase==='play'&&!busy&&h&&!h.done&&h.cards.length===2&&bank>=h.bet))return;
+  busy=true;bank-=h.bet;h.bet*=2;sfx('chip');refresh(h);ui();await give(h);
+  if(total(h.cards).t>21)h.bust=true;h.done=true;nextHand()}
+async function split(){const h=hands[ai];
+  if(!(phase==='play'&&!busy&&h&&!h.done&&h.cards.length===2&&pts(h.cards[0])===pts(h.cards[1])&&hands.length<4&&bank>=h.bet))return;
+  busy=true;bank-=h.bet;sfx('chip');
+  const h2=mkHand($('playerHands'),h.bet);h.el.after(h2.el);
+  const moved=h.cardsEl.lastElementChild;moved.style.animation='none';h2.cardsEl.appendChild(moved);
+  h2.cards.push(h.cards.pop());hands.splice(ai+1,0,h2);refresh(h);refresh(h2);ui();
+  await sleep(250);await give(h);await give(h2);
+  for(const x of[h,h2])if(total(x.cards).t===21)x.done=true;
+  nextHand()}
+async function dealerTurn(){phase='dealer';busy=true;ui();await reveal();
+  if(hands.some(h=>!h.bust))while(total(dealer.cards).t<17)await give(dealer);
+  settle()}
+
+function settle(){
+  phase='over';busy=false;
+  const dt=total(dealer.cards).t,dbj=dealer.cards.length===2&&dt===21;
+  const names={win:'Win',lose:'Lose',push:'Push',bust:'Bust',blackjack:'Blackjack'};
+  let net=0;
+  for(const h of hands){
+    const t=total(h.cards).t,bj=hands.length===1&&h.cards.length===2&&t===21;let r,pay=0;
+    if(t>21)r='bust';
+    else if(bj&&dbj){r='push';pay=h.bet}
+    else if(bj){r='blackjack';pay=h.bet*2.5}
+    else if(dbj)r='lose';
+    else if(dt>21||t>dt){r='win';pay=h.bet*2}
+    else if(t===dt){r='push';pay=h.bet}
+    else r='lose';
+    bank+=pay;net+=pay-h.bet;h.res=r;h.badge.textContent=names[r];h.badge.className='badge '+r;h.badge.hidden=false;
+  }
+  let ttl,cls;
+  if(hands.length===1){cls=hands[0].res;
+    ttl={blackjack:'Blackjack!',win:dt>21?'Dealer busts. You win!':'You win!',lose:dbj?'Dealer blackjack':'Dealer wins',push:'Push',bust:'Bust'}[cls]}
+  else{cls=net>0?'win':net<0?'lose':'push';ttl=net>0?'Round won':net<0?'Round lost':'Push'}
+  let sub=net>0?'+'+fmt(net):net<0?'−'+fmt(-net):'Bet returned';
+  if(bank<10)sub+=' · Out of chips';
+  const b=$('banner');b.className='banner '+cls;b.innerHTML=ttl+'<small>'+sub+'</small>';
+  void b.offsetWidth;b.classList.add('show');
+  sfx(cls==='bust'?'lose':cls);ui();
+}
+function newRound(){if(busy||bank<10)return;clearTable();bet=0;phase='bet';ui()}
+function resetBank(){if(busy)return;bank=1000;bet=0;clearTable();phase='bet';ui()}
+
+/* ---------- Wiring ---------- */
+document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>addBet(+b.dataset.v)));
+$('clear').onclick=clearBet;$('deal').onclick=deal;$('hit').onclick=hit;$('stand').onclick=stand;
+$('dbl').onclick=dbl;$('split').onclick=split;$('newRound').onclick=newRound;$('reset').onclick=resetBank;
+$('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'🔇 Muted':'🔊 Sound';$('mute').setAttribute('aria-pressed',muted);if(!muted)sfx('chip')};
+addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;
+  const k=e.key.toLowerCase();if(k==='h')hit();else if(k==='s')stand();else if(k==='d')dbl();else if(k==='p')split()});
+newShoe();ui();
+})();
+</script>
+</body>
+</html>
