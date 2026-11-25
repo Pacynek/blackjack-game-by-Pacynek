@@ -6,143 +6,186 @@
 <title>Blackjack</title>
 <style>
 *{box-sizing:border-box}
-:root{--gold:#d9b25f;--cw:clamp(52px,11.5vw,86px);--chip:clamp(50px,13vw,66px)}
-html,body{margin:0;height:100%}
+:root{--cwb:clamp(54px,11vw,80px);--cw:var(--cwb);--zone:calc(var(--cwb)*1.4 + 58px);--mid:196px;--spot:124px;--chip:clamp(46px,11.5vw,60px);--pchip:46px;--gold:#e0c27a;--red:#c8372d}
+html,body{margin:0}
 [hidden]{display:none!important}
-body{background:radial-gradient(circle at 50% 0,#2a1d12,#100c08 70%);color:#f3e7cf;font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.app{max-width:1000px;height:100dvh;margin:0 auto;padding:10px;display:flex;flex-direction:column;gap:10px}
-header{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
-h1{margin:0 auto 0 0;font:italic 700 clamp(1.5rem,5vw,2.1rem) Georgia,"Times New Roman",serif;color:var(--gold)}
-.stat{display:flex;flex-direction:column;align-items:flex-end;line-height:1.1;font-size:.75rem;color:#bfae8c}
-.stat b{font:700 1.25rem system-ui;color:#fff;font-variant-numeric:tabular-nums}
-button{font:600 1rem system-ui;min-height:44px;min-width:44px;padding:.5em 1.3em;border-radius:10px;border:1px solid #6b5636;background:#2a2118;color:#f3e7cf;cursor:pointer;transition:transform .12s,background .12s}
-button:hover:not(:disabled){background:#3a2d1f;transform:translateY(-1px)}
-button:disabled{opacity:.38;cursor:not-allowed}
-button:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
-button.primary{background:var(--gold);border-color:#f0d58f;color:#241a08}
-button.primary:hover:not(:disabled){background:#e6c273}
-.table{position:relative;flex:1;min-height:0;display:flex;flex-direction:column;justify-content:space-between;padding:14px 10px;border-radius:30px;border:10px solid #3b2212;overflow:auto;background:radial-gradient(ellipse at 50% 45%,#13854f,#0c5c39 55%,#06361f);box-shadow:inset 0 0 0 2px rgba(217,178,95,.45),inset 0 0 90px rgba(0,0,0,.55),0 18px 40px rgba(0,0,0,.6)}
-.table::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.12;mix-blend-mode:overlay;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
-.zone{display:flex;flex-direction:column;align-items:center;gap:8px}
-.lbl{font:italic 1rem Georgia,serif;color:rgba(243,231,207,.7)}
-.hands{display:flex;justify-content:center;flex-wrap:wrap;gap:clamp(10px,3vw,34px);min-height:calc(var(--cw)*1.4 + 44px)}
-.hands:empty::after{content:attr(data-empty);align-self:center;font:italic 1rem Georgia,serif;color:rgba(243,231,207,.6);text-align:center;padding:0 12px}
-.hand{display:flex;flex-direction:column;align-items:center;gap:8px;padding:6px 8px;border-radius:14px;border:2px solid transparent;transition:border-color .2s,background .2s}
-.hand.active{border-color:var(--gold);background:rgba(0,0,0,.18)}
-.cards{display:flex;min-height:calc(var(--cw)*1.4)}
-.card{width:var(--cw);aspect-ratio:5/7;perspective:700px;animation:deal .45s cubic-bezier(.2,.8,.2,1) both}
+body{background:radial-gradient(ellipse at 50% -10%,#3b2a1b,#120d09 60%,#080605);color:#eee8d8;font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.app{max-width:980px;min-height:100dvh;margin:0 auto;padding:10px;display:flex;flex-direction:column;gap:10px}
+header{height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 6px}
+h1{margin:0;font:italic 700 1.5rem Georgia,serif;background:linear-gradient(#fff0b8,#c99a3c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.stat{display:flex;align-items:center;gap:10px;font-size:.8rem;color:#a99f88;padding:4px 14px;border-radius:999px;background:rgba(0,0,0,.35);border:1px solid rgba(224,194,122,.25)}
+.stat b{min-width:7ch;text-align:right;font:700 1.2rem system-ui;color:#fff;font-variant-numeric:tabular-nums}
+button{font:600 .95rem system-ui;min-height:44px;min-width:44px;padding:.5em 1.4em;border-radius:999px;border:1px solid rgba(255,255,255,.28);background:rgba(0,0,0,.25);color:#eee8d8;cursor:pointer;transition:background .15s,transform .15s}
+button:hover:not(:disabled){background:rgba(255,255,255,.12)}
+button:disabled{opacity:.35;cursor:not-allowed}
+button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+button.primary{background:linear-gradient(#f3e7c0,#d9bd78);border-color:#f3e7c0;color:#1d1608;box-shadow:0 4px 14px rgba(224,194,122,.3)}
+button.primary:hover:not(:disabled){background:linear-gradient(#fff6d6,#e6cb88)}
+button.allin{background:linear-gradient(#d94a3a,#9c2218);border-color:#f08a7c;color:#fff}
+button.allin:hover:not(:disabled){background:linear-gradient(#e85a49,#b02c20)}
+.table{position:relative;flex:1;min-height:calc(var(--zone)*2 + var(--mid) + 24px);display:grid;grid-template-rows:var(--zone) var(--mid) var(--zone);align-content:center;padding:12px 8px;border-radius:36px;border:14px solid transparent;
+ background:radial-gradient(ellipse at 50% 35%,rgba(255,255,255,.16),transparent 60%) padding-box,radial-gradient(ellipse at 50% 45%,#1f7a55,#14593f 60%,#0a3324) padding-box,linear-gradient(135deg,#7d4d29,#3b200f 38%,#6e4426 62%,#2c1809) border-box;
+ background-clip:padding-box,padding-box,border-box;box-shadow:0 30px 60px rgba(0,0,0,.65),inset 0 0 0 1px rgba(255,255,255,.1),inset 0 10px 50px rgba(0,0,0,.5);overflow:hidden}
+.table::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.14;mix-blend-mode:overlay;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.table::after{content:"";position:absolute;inset:7px;border-radius:26px;border:1.5px dashed rgba(224,194,122,.28);pointer-events:none}
+.table.shake{animation:shake .5s}
+@keyframes shake{20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(2px)}}
+.shoe{position:absolute;top:14px;right:18px;width:64px;height:38px;border-radius:6px 6px 12px 12px;background:linear-gradient(#333,#0b0b0b);box-shadow:0 8px 14px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,255,255,.2);z-index:1}
+.shoe::before{content:"";position:absolute;left:6px;right:6px;top:-5px;height:7px;border-radius:2px;background:repeating-linear-gradient(90deg,#f6f2e6 0 3px,#bdb7a4 3px 4px)}
+.zone{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;height:var(--zone)}
+.lbl{position:absolute;left:14px;top:6px;font:italic .8rem Georgia,serif;color:rgba(255,255,255,.5)}
+.hands{display:flex;justify-content:center;align-items:center;gap:clamp(8px,2.5vw,28px);height:100%}
+.hands[data-n="3"],.hands[data-n="4"]{--cw:calc(var(--cwb)*.78)}
+.hands:empty{gap:10px}
+.hands:empty::before,.hands:empty::after{content:"";width:var(--cw);aspect-ratio:5/7;border:1.5px dashed rgba(255,255,255,.17);border-radius:8px}
+.hand{display:flex;flex-direction:column;align-items:center;gap:6px;padding:4px 6px;border:2px solid transparent;border-radius:12px;transition:border-color .2s,background .2s,box-shadow .2s}
+.hand.active{border-color:rgba(224,194,122,.9);background:rgba(0,0,0,.18);box-shadow:0 0 18px rgba(224,194,122,.25)}
+.cards{display:flex;height:calc(var(--cw)*1.4)}
+.card{position:relative;width:var(--cw);aspect-ratio:5/7;perspective:700px;animation:deal .45s cubic-bezier(.2,.8,.2,1) both}
 .card+.card{margin-left:calc(var(--cw)*-.5)}
-@keyframes deal{from{transform:translate(30vw,-40vh) rotate(18deg) scale(.8);opacity:0}to{transform:none;opacity:1}}
-.inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s}
+@keyframes deal{from{transform:translate(110px,-90px) rotate(14deg) scale(.85);opacity:0}to{transform:none;opacity:1}}
+.inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s}
 .card.up .inner{transform:rotateY(180deg)}
-.face{position:absolute;inset:0;border-radius:calc(var(--cw)*.09);-webkit-backface-visibility:hidden;backface-visibility:hidden;box-shadow:0 2px 7px rgba(0,0,0,.5)}
-.front{background:#fbf8f0;color:#16130f;transform:rotateY(180deg)}
-.front.red{color:#b3261e}
-.back{background:repeating-linear-gradient(45deg,#7a1f2b 0 6px,#611824 6px 12px);box-shadow:inset 0 0 0 4px #fbf8f0,0 2px 7px rgba(0,0,0,.5)}
-.cn{position:absolute;font:700 calc(var(--cw)*.24)/1 Georgia,serif;text-align:center}
-.tl{top:6%;left:8%}
-.br{bottom:6%;right:8%;transform:rotate(180deg)}
-.pip{position:absolute;inset:0;display:grid;place-items:center;font:calc(var(--cw)*.52)/1 Georgia,serif}
-.info{display:flex;align-items:center;gap:6px;min-height:28px}
-.tot{background:rgba(0,0,0,.5);border-radius:999px;padding:2px 12px;font:600 .95rem system-ui;min-width:2.2ch;text-align:center}
-.tot.bust{background:#b3261e}
-.bt{background:var(--gold);color:#241a08;border-radius:999px;padding:2px 10px;font:700 .85rem system-ui}
+.card.pick{filter:drop-shadow(0 0 10px #f3d27a);z-index:2}
+.card[data-v]::after{content:"= " attr(data-v);position:absolute;left:5px;bottom:5px;padding:0 6px;border-radius:999px;background:#17191a;color:#f3d27a;font:700 calc(var(--cw)*.16)/1.5 system-ui;z-index:3;pointer-events:none}
+.face{position:absolute;inset:0;border-radius:calc(var(--cw)*.1);-webkit-backface-visibility:hidden;backface-visibility:hidden;box-shadow:0 1px 1px rgba(0,0,0,.25),0 7px 14px rgba(0,0,0,.3)}
+.front{background:linear-gradient(145deg,#fffefb,#ece6d6);border:1px solid #c9c3b0;color:#17191a;transform:rotateY(180deg);overflow:hidden}
+.front::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,rgba(255,255,255,.6),transparent 42%);pointer-events:none}
+.front.red{color:var(--red)}
+.back{border:calc(var(--cw)*.06) solid #f6f2e6;background:radial-gradient(circle,#c23247 0 13%,transparent 14%),repeating-linear-gradient(45deg,#7d1626 0 5px,#5c0e1b 5px 10px),#5c0e1b}
+.back::after{content:"";position:absolute;inset:4px;border:1px solid rgba(224,194,122,.7);border-radius:calc(var(--cw)*.05)}
+.cn{position:absolute;font:700 calc(var(--cw)*.2)/1.05 system-ui;text-align:center}
+.tl{top:5%;left:8%}
+.br{bottom:5%;right:8%;transform:rotate(180deg)}
+.pp{position:absolute;font:calc(var(--cw)*.25)/1 system-ui;transform:translate(-50%,-50%)}
+.pp.f{transform:translate(-50%,-50%) rotate(180deg)}
+.fc{position:absolute;inset:17% 24%;border:1px solid currentColor;border-radius:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(201,154,60,.22),transparent)}
+.fc b{font:700 calc(var(--cw)*.46)/1 Georgia,serif}
+.fc i{font:normal calc(var(--cw)*.22)/1 system-ui}
+.info{height:26px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.tot{background:rgba(0,0,0,.5);border-radius:999px;padding:1px 11px;font:700 .85rem system-ui;min-width:2.2ch;text-align:center}
+.tot:empty{display:none}
+.tot.bust{background:var(--red)}
+.bt{border:1px solid rgba(255,255,255,.4);border-radius:999px;padding:0 8px;font:600 .75rem system-ui}
 .bt:empty{display:none}
-.badge{padding:2px 10px;border-radius:6px;font:800 .8rem system-ui;color:#fff}
-.badge.win{background:#1f9d55}.badge.lose,.badge.bust{background:#b3261e}.badge.push{background:#6b7280}.badge.blackjack{background:var(--gold);color:#241a08}
-.center{position:relative;min-height:90px;display:grid;place-items:center;text-align:center}
-.rule{margin:0;font:italic .95rem Georgia,serif;color:rgba(217,178,95,.8)}
-.banner{--b:var(--gold);position:absolute;left:50%;top:50%;z-index:3;transform:translate(-50%,-50%) scale(.7);opacity:0;pointer-events:none;padding:8px 26px;border-radius:14px;border:2px solid var(--b);background:rgba(10,12,10,.88);font:700 clamp(1.3rem,5vw,2.3rem)/1.15 Georgia,serif;white-space:nowrap;transition:opacity .25s,transform .35s cubic-bezier(.2,1.4,.4,1)}
-.banner.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
-.banner small{display:block;font:600 .9rem system-ui;color:#d8cdb4}
-.banner.win{--b:#2fbf71}.banner.lose,.banner.bust{--b:#e5484d}.banner.push{--b:#9ca3af}.banner.blackjack{--b:#f0c860}
-.banner.blackjack{color:#f0c860}.banner.win{color:#7ee2a8}.banner.lose,.banner.bust{color:#ff8a8e}
-.controls{display:flex;justify-content:center;padding-bottom:max(4px,env(safe-area-inset-bottom))}
-.panel{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%}
+.badge{padding:1px 9px;border-radius:999px;font:700 .75rem system-ui;color:#fff}
+.badge.win{background:#2b9a63}.badge.lose,.badge.bust{background:var(--red)}.badge.push{background:#6b7570}.badge.blackjack{background:var(--gold);color:#1d1a10}
+.mid{position:relative;z-index:1;height:var(--mid);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.print{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.print text{font:600 20px Georgia,serif;letter-spacing:3px;fill:rgba(240,214,150,.5)}
+.spot{position:relative;width:var(--spot);height:var(--spot);border-radius:50%;border:2px dashed rgba(240,214,150,.45);background:radial-gradient(circle,rgba(0,0,0,.28),rgba(0,0,0,.08));box-shadow:inset 0 3px 10px rgba(0,0,0,.4)}
+.hint{position:absolute;inset:0;display:grid;place-items:center;font:italic .85rem Georgia,serif;color:rgba(255,255,255,.5);opacity:0;transition:opacity .2s}
+.spot.empty .hint{opacity:1}
+.pile{position:absolute;left:50%;top:50%;width:0;height:0;transition:transform .7s ease-in,opacity .7s}
+.pile.out-win{transform:translateY(190px);opacity:0}
+.pile.out-lose{transform:translateY(-230px);opacity:0}
+.spot.locked .pc{pointer-events:none}
+.wager{position:relative;height:26px;font:700 1.05rem system-ui;font-variant-numeric:tabular-nums}
+.chip{--c:#2f5fb3;--d:var(--chip);width:var(--d);height:var(--d);padding:0;min-width:0;min-height:0;border:0;border-radius:50%;position:relative;
+ background:radial-gradient(circle,var(--c) 0 55%,transparent 56%),repeating-conic-gradient(#f4f0e4 0 17deg,var(--c) 17deg 45deg);
+ box-shadow:0 1px 0 rgba(0,0,0,.45),0 2px 0 rgba(0,0,0,.3),0 3px 0 rgba(0,0,0,.2),0 7px 10px rgba(0,0,0,.45)}
+.chip::before{content:"";position:absolute;inset:19%;border-radius:50%;border:1.5px dashed rgba(255,255,255,.75)}
+.chip::after{content:"";position:absolute;inset:0;border-radius:50%;background:radial-gradient(circle at 30% 24%,rgba(255,255,255,.38),transparent 48%,rgba(0,0,0,.28))}
+.chip span{position:relative;z-index:1;color:#fff;font:700 calc(var(--d)*.26) system-ui;text-shadow:0 1px 1px rgba(0,0,0,.6)}
+.tray .chip:hover:not(:disabled){transform:translateY(-5px);background:radial-gradient(circle,var(--c) 0 55%,transparent 56%),repeating-conic-gradient(#f4f0e4 0 17deg,var(--c) 17deg 45deg)}
+.chip:disabled{filter:grayscale(.85)}
+.pc{--d:var(--pchip);position:absolute;left:50%;top:50%;margin:calc(var(--pchip)/-2) 0 0 calc(var(--pchip)/-2);transition:transform .45s cubic-bezier(.2,.9,.3,1.1),opacity .4s}
+.c25{--c:#b3392f}.c50{--c:#d98a2b}.c100{--c:#1f2321}.c500{--c:#6a3fa0}
+.controls{height:148px;display:grid;padding-bottom:max(4px,env(safe-area-inset-bottom))}
+.panel{grid-area:1/1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
 .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
-.chips{display:flex;gap:clamp(8px,2.5vw,18px);justify-content:center}
-.chip{--c:#2f5fb3;width:var(--chip);height:var(--chip);min-height:0;min-width:0;padding:0;border:0;border-radius:50%;position:relative;background:repeating-conic-gradient(#f5f1e6 0 15deg,var(--c) 15deg 45deg);box-shadow:0 4px 8px rgba(0,0,0,.5)}
-.chip:hover:not(:disabled){background:repeating-conic-gradient(#f5f1e6 0 15deg,var(--c) 15deg 45deg);transform:translateY(-4px)}
-.chip::before{content:"";position:absolute;inset:15%;border-radius:50%;background:var(--c);box-shadow:inset 0 0 0 2px rgba(255,255,255,.55)}
-.chip span{position:relative;z-index:1;color:#fff;font:700 calc(var(--chip)*.27) system-ui}
-.chip:disabled{filter:grayscale(.8)}
-.c25{--c:#b3261e}.c50{--c:#d9822b}.c100{--c:#1b1b1b}
-@media(prefers-reduced-motion:reduce){.card{animation:none}.inner,.banner{transition:none}}
-@media(max-width:520px){.app{padding:6px}.table{border-width:6px;padding:10px 4px}button{padding:.5em 1em}}
+.tray{display:flex;gap:clamp(8px,2.5vw,18px)}
+.fx{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;opacity:0}
+.fx.win,.fx.blackjack{background:radial-gradient(circle,rgba(255,226,140,.32),transparent 62%);animation:fl 1.6s ease-out}
+.fx.lose,.fx.bust{background:radial-gradient(circle,transparent 35%,rgba(190,30,25,.5));animation:fl 1.6s ease-out}
+@keyframes fl{0%{opacity:1}100%{opacity:0}}
+.pt{position:absolute;left:50%;top:50%;width:8px;height:13px;background:var(--pc);animation:burst 1.7s cubic-bezier(.15,.75,.35,1) both}
+.pt.coin{width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff6c8,#e0a93a 60%,#a8741a)}
+@keyframes burst{0%{transform:translate(0,0) rotate(0);opacity:1}55%{transform:translate(var(--dx),var(--dy)) rotate(var(--r));opacity:1}100%{transform:translate(var(--dx),calc(var(--dy) + 140px)) rotate(var(--r));opacity:0}}
+.toast,.ace{position:absolute;left:50%;top:50%;z-index:6;text-align:center;color:#fff;background:linear-gradient(160deg,rgba(20,32,27,.94),rgba(8,12,10,.94));border:1.5px solid var(--b,#e0c27a);border-radius:22px;box-shadow:0 20px 50px rgba(0,0,0,.6),0 0 40px -6px var(--b,#e0c27a);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.toast{pointer-events:none;opacity:0;min-width:min(86%,300px);padding:34px 34px 16px;white-space:nowrap;transform:translate(-50%,-50%) scale(.6) rotate(-3deg);transition:opacity .3s,transform .5s cubic-bezier(.2,1.5,.35,1)}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+.ico{position:absolute;left:50%;top:-26px;width:52px;height:52px;margin-left:-26px;border-radius:50%;display:grid;place-items:center;font:700 1.35rem Georgia,serif;background:var(--b);color:#10140f;box-shadow:0 0 0 5px #0c120f,0 0 26px var(--b)}
+.ttl{font:700 clamp(1.5rem,6vw,2.2rem)/1.1 Georgia,serif}
+.amt{margin-top:4px;min-height:1.8rem;font:700 1.5rem system-ui;font-variant-numeric:tabular-nums;color:var(--b)}
+.sub{font:500 .85rem system-ui;color:#aab5af}
+.toast.win{--b:#4fd18b}.toast.lose,.toast.bust{--b:#ff7a72}.toast.push{--b:#b6beb9}.toast.blackjack{--b:#f0d27c}
+.toast.blackjack .ttl{background:linear-gradient(90deg,#f0d27c,#fff6c8,#e0a93a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ace{padding:16px 20px;animation:pop .35s cubic-bezier(.2,1.5,.35,1) both}
+@keyframes pop{from{transform:translate(-50%,-50%) scale(.6);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}
+.ace .ttl{font-size:1.2rem;margin-bottom:10px}
+.ace button{display:flex;flex-direction:column;align-items:center;gap:0;min-width:96px;padding:.5em 1em;border-radius:14px}
+.ace button b{font:700 1.8rem/1.1 Georgia,serif;color:#f3d27a}
+.ace button small{font-size:.75rem;color:#aab5af}
+@media(prefers-reduced-motion:reduce){.card,.ace,.table.shake,.fx{animation:none}.inner,.toast,.pc,.pile{transition:none}}
+@media(max-width:520px){:root{--mid:176px;--spot:108px;--pchip:40px}.app{padding:6px}.table{border-radius:26px;border-width:10px}.shoe{display:none}button{padding:.5em 1em}.print text{font-size:17px;letter-spacing:2px}}
 </style>
 </head>
 <body>
 <div class="app">
-  <header>
-    <h1>Blackjack</h1>
-    <div class="stat">Bet<b id="bet">$0</b></div>
-    <div class="stat">Bankroll<b id="bank">$1,000</b></div>
-    <button id="mute" aria-pressed="false" title="Toggle sound">🔊 Sound</button>
-  </header>
-  <main class="table">
-    <section class="zone"><div class="lbl">Dealer</div><div class="hands" id="dealerHands"></div></section>
-    <div class="center">
-      <p class="rule">Blackjack pays 3 to 2 · Dealer stands on 17</p>
-      <div class="banner" id="banner" role="status" aria-live="polite"></div>
+  <header><h1>Blackjack</h1><div class="stat">Bankroll<b id="bank">$1,000</b></div></header>
+  <main class="table" id="table">
+    <div class="shoe"></div>
+    <section class="zone"><span class="lbl">Dealer</span><div class="hands" id="dealerHands"></div></section>
+    <div class="mid">
+      <svg class="print" viewBox="0 0 800 196" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><text x="296" y="104" text-anchor="end">BLACKJACK PAYS 3:2</text><text x="504" y="104">DEALER STANDS ON 17</text></svg>
+      <div class="spot empty locked" id="spot"><span class="hint">Place bet</span><div class="pile" id="pile"></div></div>
+      <div class="wager" id="wager"></div>
     </div>
-    <section class="zone"><div class="hands" id="playerHands" data-empty="Click chips to place your bet, then press Deal."></div><div class="lbl">You</div></section>
+    <section class="zone"><span class="lbl">You</span><div class="hands" id="playerHands" data-n="1"></div></section>
+    <div class="fx" id="fx"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <div class="ace" id="ace" hidden role="dialog" aria-label="Choose Ace value">
+      <div class="ttl">Count your Ace as</div>
+      <div class="row"><button data-lo="0"><b>11</b><small></small></button><button data-lo="1"><b>1</b><small></small></button></div>
+    </div>
   </main>
   <footer class="controls">
     <div class="panel" id="betPanel">
-      <div class="chips">
-        <button class="chip c10" data-v="10" aria-label="Bet $10"><span>$10</span></button>
-        <button class="chip c25" data-v="25" aria-label="Bet $25"><span>$25</span></button>
-        <button class="chip c50" data-v="50" aria-label="Bet $50"><span>$50</span></button>
-        <button class="chip c100" data-v="100" aria-label="Bet $100"><span>$100</span></button>
+      <div class="tray">
+        <button class="chip c10" data-v="10" aria-label="Add $10 chip"><span>10</span></button>
+        <button class="chip c25" data-v="25" aria-label="Add $25 chip"><span>25</span></button>
+        <button class="chip c50" data-v="50" aria-label="Add $50 chip"><span>50</span></button>
+        <button class="chip c100" data-v="100" aria-label="Add $100 chip"><span>100</span></button>
+        <button class="chip c500" data-v="500" aria-label="Add $500 chip"><span>500</span></button>
       </div>
-      <div class="row"><button id="clear">Clear Bet</button><button id="deal" class="primary">Deal</button></div>
+      <div class="row"><button id="clear">Clear Bet</button><button id="allin" class="allin" title="Bet everything and deal">All In</button><button id="deal" class="primary">Deal</button></div>
     </div>
-    <div class="panel row" id="actPanel" hidden>
-      <button id="hit" title="Hit (H)">Hit</button>
-      <button id="stand" title="Stand (S)">Stand</button>
-      <button id="dbl" title="Double Down (D)">Double Down</button>
-      <button id="split" title="Split (P)">Split</button>
+    <div class="panel" id="actPanel" hidden>
+      <div class="row">
+        <button id="hit" title="Hit (H)">Hit</button>
+        <button id="stand" title="Stand (S)">Stand</button>
+        <button id="dbl" title="Double Down (D)">Double Down</button>
+        <button id="split" title="Split (P)">Split</button>
+      </div>
     </div>
-    <div class="panel row" id="overPanel" hidden>
-      <button id="newRound" class="primary">New Round</button>
-      <button id="reset" hidden>Reset Bankroll</button>
+    <div class="panel" id="overPanel" hidden>
+      <div class="row"><button id="newRound" class="primary">New Round</button><button id="reset" hidden>Reset Bankroll</button></div>
     </div>
   </footer>
 </div>
 <script>
 (()=>{
-const SU=['♠','♥','♦','♣'],RK=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+const SU=['♠\uFE0E','♥\uFE0E','♦\uFE0E','♣\uFE0E'],RK=['A','2','3','4','5','6','7','8','9','10','J','Q','K'],DEN=[500,100,50,25,10];
+const PIPS={2:'C27 C73',3:'C27 C50 C73',4:'L27 R27 L73 R73',5:'L27 R27 C50 L73 R73',6:'L27 R27 L50 R50 L73 R73',7:'L27 R27 C38 L50 R50 L73 R73',8:'L27 R27 C38 L50 R50 C62 L73 R73',9:'L27 R27 L42 R42 C50 L58 R58 L73 R73',10:'L27 R27 C35 L42 R42 L58 R58 C65 L73 R73'};
 const $=id=>document.getElementById(id);
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const fmt=n=>'$'+n.toLocaleString('en-US',{minimumFractionDigits:Number.isInteger(n)?0:2,maximumFractionDigits:2});
-let shoe=[],bank=1000,bet=0,hands=[],dealer=null,ai=0,phase='bet',busy=false,muted=false;
-
-/* ---------- Sound (Web Audio) ---------- */
-let ac=null;
-function A(){if(muted)return null;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();}catch(e){return null}return ac}
-function tone(f,d,o={}){const a=A();if(!a)return;const t=a.currentTime+(o.at||0),os=a.createOscillator(),g=a.createGain();
-  os.type=o.type||'sine';os.frequency.setValueAtTime(f,t);if(o.to)os.frequency.exponentialRampToValueAtTime(o.to,t+d);
-  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(o.v||.07,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+d);
-  os.connect(g);g.connect(a.destination);os.start(t);os.stop(t+d+.02)}
-function noise(d,f,v){const a=A();if(!a)return;const n=a.sampleRate*d|0,b=a.createBuffer(1,n,a.sampleRate),x=b.getChannelData(0);
-  for(let i=0;i<n;i++)x[i]=(Math.random()*2-1)*(1-i/n);
-  const s=a.createBufferSource(),fl=a.createBiquadFilter(),g=a.createGain();s.buffer=b;fl.type='bandpass';fl.frequency.value=f;g.gain.value=v;
-  s.connect(fl);fl.connect(g);g.connect(a.destination);s.start()}
-const arp=(fs,v)=>fs.forEach((f,i)=>tone(f,.25,{at:i*.09,v,type:'triangle'}));
-const S={deal:()=>noise(.08,2200,.2),flip:()=>noise(.12,1500,.18),
-  chip:()=>{tone(1800,.05,{type:'square',v:.025});tone(1200,.07,{type:'square',v:.025,at:.03})},
-  win:()=>arp([523,659,784,1047],.06),blackjack:()=>arp([523,659,784,1047,1319,1568],.07),
-  lose:()=>tone(220,.45,{type:'sawtooth',to:110,v:.045}),
-  push:()=>{tone(440,.15,{v:.05});tone(440,.15,{at:.18,v:.05})}};
-const sfx=n=>S[n]&&S[n]();
+let shoe=[],bank=1000,bet=0,hands=[],dealer=null,ai=0,phase='bet',busy=false,pile=[],tToast=0,tOut=0;
 
 /* ---------- Cards ---------- */
 const pts=c=>c.r===0?11:c.r>=9?10:c.r+1;
-function total(cs){let t=0,a=0;for(const c of cs){t+=pts(c);if(c.r===0)a++}while(t>21&&a){t-=10;a--}return{t,soft:a>0}}
+function total(cs){let t=0;const hi=[];
+  for(const c of cs){if(c.r===0){if(c.low){c.v=1;t+=1}else{c.v=11;t+=11;hi.push(c)}}else t+=pts(c)}
+  while(t>21&&hi.length){hi.pop().v=1;t-=10}
+  return{t,soft:hi.length>0}}
 function newShoe(){shoe=[];for(let d=0;d<4;d++)for(let s=0;s<4;s++)for(let r=0;r<13;r++)shoe.push({r,s});
   for(let i=shoe.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[shoe[i],shoe[j]]=[shoe[j],shoe[i]]}}
-function cardEl(c,down){const d=document.createElement('div'),r=RK[c.r],s=SU[c.s];d.className='card'+(down?'':' up');
-  d.innerHTML=`<div class="inner"><div class="face front${c.s===1||c.s===2?' red':''}"><span class="cn tl">${r}<br>${s}</span><span class="pip">${c.r>=10?r:s}</span><span class="cn br">${r}<br>${s}</span></div><div class="face back"></div></div>`;
+function cardEl(c,down){const d=document.createElement('div'),r=RK[c.r],s=SU[c.s];d.className='card'+(down?'':' up');c.el=d;let body;
+  if(c.r===0)body=`<span class="pp" style="left:50%;top:50%;font-size:calc(var(--cw)*.62)">${s}</span>`;
+  else if(c.r>=10)body=`<span class="fc"><b>${r}</b><i>${s}</i></span>`;
+  else body=PIPS[c.r+1].split(' ').map(p=>{const x={L:36,C:50,R:64}[p[0]],y=+p.slice(1);return`<span class="pp${y>50?' f':''}" style="left:${x}%;top:${y}%">${s}</span>`}).join('');
+  d.innerHTML=`<div class="inner"><div class="face front${c.s===1||c.s===2?' red':''}"><span class="cn tl">${r}<br>${s}</span>${body}<span class="cn br">${r}<br>${s}</span></div><div class="face back"></div></div>`;
   return d}
 
 /* ---------- Hands ---------- */
@@ -152,20 +195,54 @@ function mkHand(container,b){const el=document.createElement('div');el.className
   container.appendChild(el);return h}
 function refresh(h){const vis=h.hidden?h.cards.slice(0,1):h.cards,{t,soft}=total(vis);
   h.totEl.textContent=vis.length?(soft&&t<21&&vis.length>1?'Soft '+t:t):'';
-  h.totEl.classList.toggle('bust',t>21);h.btEl.textContent=h.bet?fmt(h.bet):''}
+  h.totEl.classList.toggle('bust',t>21);h.btEl.textContent=hands.length>1&&h.bet?fmt(h.bet):'';
+  if(h!==dealer)h.cards.forEach(c=>{if(c.r===0&&c.el)c.el.dataset.v=c.v})}
 async function give(h,down){const c=shoe.pop(),el=cardEl(c,down);h.cards.push(c);h.cardsEl.appendChild(el);
-  if(down)h.holeEl=el;sfx('deal');refresh(h);await sleep(380)}
+  if(down)h.holeEl=el;refresh(h);await sleep(380)}
 
-/* ---------- UI state ---------- */
+/* ---------- Ace choice (player only) ---------- */
+function chooseAce(h,c){return new Promise(res=>{
+  c.low=false;const a=total(h.cards).t;c.low=true;const b=total(h.cards).t;c.low=false;total(h.cards);
+  const d=$('ace'),bs=d.querySelectorAll('button');bs[0].querySelector('small').textContent='Total '+a;bs[1].querySelector('small').textContent='Total '+b;
+  c.el.classList.add('pick');d.hidden=false;
+  bs.forEach(x=>x.onclick=()=>{c.low=x.dataset.lo==='1';c.ch=true;d.hidden=true;c.el.classList.remove('pick');refresh(h);res()})})}
+async function resolveAces(h){for(const c of h.cards){if(c.r!==0||c.ch)continue;const{t}=total(h.cards);
+  if(c.v!==11||t>=21){c.ch=true;continue}await chooseAce(h,c)}}
+
+/* ---------- Chips on the table ---------- */
+function mkChip(v){const el=document.createElement('button');el.className='chip pc c'+v;el.dataset.v=v;el.innerHTML='<span>'+v+'</span>';el.setAttribute('aria-label','Remove $'+v+' chip');return el}
+function layout(){pile.forEach((p,i)=>{p.x=(i*37)%7-3;p.y=-Math.min(i,11)*5;p.el.style.transform=`translate(${p.x}px,${p.y}px)`});$('spot').classList.toggle('empty',!pile.length)}
+function addChip(v,from){const p={v,el:mkChip(v)};pile.push(p);$('pile').appendChild(p.el);layout();
+  const r=from.getBoundingClientRect(),d=p.el.getBoundingClientRect();
+  const dx=r.left+r.width/2-d.left-d.width/2,dy=r.top+r.height/2-d.top-d.height/2;
+  p.el.style.transition='none';p.el.style.transform=`translate(${p.x+dx}px,${p.y+dy}px) scale(1.15)`;void p.el.offsetWidth;
+  p.el.style.transition='';p.el.style.transform=`translate(${p.x}px,${p.y}px)`;p.el.onclick=()=>removeChip(p,0)}
+function removeChip(p,delay){const i=pile.indexOf(p);if(i<0||phase!=='bet'||busy)return;pile.splice(i,1);bank+=p.v;bet-=p.v;
+  const t=document.querySelector('.tray .chip[data-v="'+p.v+'"]'),r=t.getBoundingClientRect(),d=p.el.getBoundingClientRect();
+  p.el.onclick=null;p.el.style.transitionDelay=delay+'ms';
+  p.el.style.transform=`translate(${p.x+r.left+r.width/2-d.left-d.width/2}px,${p.y+r.top+r.height/2-d.top-d.height/2}px) scale(.8)`;p.el.style.opacity=0;
+  setTimeout(()=>p.el.remove(),500+delay);layout();ui()}
+function extra(a,from){let i=0;for(const v of DEN)while(a>=v){a-=v;setTimeout(addChip,Math.min(i++,12)*90,v,from)}}
+function addBet(v,btn){if(phase!=='bet'||busy||bank<v)return;bank-=v;bet+=v;addChip(v,btn);ui()}
+function clearBet(){if(phase!=='bet'||busy||!bet)return;[...pile].forEach((p,i)=>removeChip(p,Math.min(i,12)*40))}
+async function allIn(){if(phase!=='bet'||busy)return;let a=bank;const list=[];
+  for(const v of DEN)while(a>=v){a-=v;list.push(v)}
+  if(!list.length)return;busy=true;const sum=list.reduce((s,v)=>s+v,0);bank-=sum;bet+=sum;
+  list.forEach((v,i)=>setTimeout(addChip,Math.min(i,12)*55,v,document.querySelector('.tray .chip[data-v="'+v+'"]')));
+  ui();await sleep(Math.min(list.length,12)*55+600);busy=false;deal()}
+
+/* ---------- UI ---------- */
 function ui(){
   const cur=hands[ai],can=phase==='play'&&!busy&&cur&&!cur.done,two=can&&cur.cards.length===2;
   $('bank').textContent=fmt(bank);
-  $('bet').textContent=fmt(phase==='bet'?bet:hands.reduce((s,h)=>s+h.bet,0));
+  const w=phase==='bet'?bet:hands.reduce((s,h)=>s+h.bet,0);$('wager').textContent=w?fmt(w):'';
+  $('spot').classList.toggle('locked',phase!=='bet'||busy);
   $('betPanel').hidden=phase!=='bet';
   $('actPanel').hidden=!(phase==='play'||phase==='dealer');
   $('overPanel').hidden=phase!=='over';
-  document.querySelectorAll('.chip').forEach(b=>b.disabled=busy||bank<+b.dataset.v);
+  document.querySelectorAll('.tray .chip').forEach(b=>b.disabled=busy||bank<+b.dataset.v);
   $('clear').disabled=$('deal').disabled=busy||bet<=0;
+  $('allin').disabled=busy||bank<10;
   $('hit').disabled=$('stand').disabled=!can;
   $('dbl').disabled=!(two&&bank>=cur.bet);
   $('split').disabled=!(two&&pts(cur.cards[0])===pts(cur.cards[1])&&hands.length<4&&bank>=cur.bet);
@@ -173,37 +250,49 @@ function ui(){
   $('reset').hidden=bank>=10;
   hands.forEach((h,i)=>h.el.classList.toggle('active',hands.length>1&&phase==='play'&&i===ai));
 }
-function clearTable(){$('playerHands').innerHTML='';$('dealerHands').innerHTML='';hands=[];dealer=null;ai=0;$('banner').className='banner'}
+function clearTable(){clearTimeout(tToast);clearTimeout(tOut);$('toast').className='toast';$('fx').className='fx';$('fx').innerHTML='';$('table').classList.remove('shake');$('ace').hidden=true;
+  $('playerHands').innerHTML='';$('dealerHands').innerHTML='';$('playerHands').dataset.n=1;
+  $('pile').innerHTML='';$('pile').className='pile';pile=[];hands=[];dealer=null;ai=0;layout()}
 
-/* ---------- Betting ---------- */
-function addBet(v){if(phase!=='bet'||busy||bank<v)return;bank-=v;bet+=v;sfx('chip');ui()}
-function clearBet(){if(phase!=='bet'||busy||!bet)return;bank+=bet;bet=0;sfx('chip');ui()}
+/* ---------- Popups & effects ---------- */
+const ICO={blackjack:'21',win:'★',lose:'✕',bust:'!',push:'='};
+function countUp(el,n){const t0=performance.now(),s=n<0?'−':'+';(function f(t){const k=Math.min(1,(t-t0)/800),v=Math.abs(n)*(1-Math.pow(1-k,3));el.textContent=s+fmt(Math.round(v*100)/100);if(k<1)requestAnimationFrame(f)})(t0)}
+function fx(cls){const f=$('fx');f.className='fx';f.innerHTML='';void f.offsetWidth;f.className='fx '+cls;
+  if(cls==='win'||cls==='blackjack'){const bj=cls==='blackjack',cols=bj?['#f3d27a','#e0a93a','#fff1b8']:['#4fd18b','#f3d27a','#fff','#7ab8ff'];
+    for(let i=0;i<(bj?44:30);i++){const p=document.createElement('i'),a=Math.random()*6.28,d=90+Math.random()*180;p.className='pt'+(bj&&i%2?' coin':'');
+      p.style.cssText=`--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d-60}px;--r:${Math.random()*720-360}deg;--pc:${cols[i%cols.length]};animation-delay:${Math.random()*.15}s`;f.appendChild(p)}}
+  else if(cls==='lose'||cls==='bust'){const t=$('table');t.classList.remove('shake');void t.offsetWidth;t.classList.add('shake')}}
+function toast(cls,ttl,sub,net){const t=$('toast');clearTimeout(tToast);t.className='toast '+cls;
+  t.innerHTML=`<div class="ico">${ICO[cls]}</div><div class="ttl">${ttl}</div><div class="amt"></div><div class="sub">${sub}</div>`;
+  if(net)countUp(t.querySelector('.amt'),net);fx(cls);void t.offsetWidth;t.classList.add('show');tToast=setTimeout(()=>t.classList.remove('show'),3400)}
 
 /* ---------- Round flow ---------- */
 async function deal(){
   if(phase!=='bet'||busy||bet<=0)return;
-  busy=true;if(shoe.length<60)newShoe();clearTable();phase='play';
+  busy=true;if(shoe.length<60)newShoe();
+  $('playerHands').innerHTML='';$('dealerHands').innerHTML='';phase='play';
   const p=mkHand($('playerHands'),bet);hands=[p];dealer=mkHand($('dealerHands'),0);dealer.hidden=true;ui();
   await give(p);await give(dealer);await give(p);await give(dealer,true);
   if(total(p.cards).t===21||total(dealer.cards).t===21){await reveal();p.done=true;settle();return}
-  busy=false;ui();
+  await resolveAces(p);busy=false;ui();
 }
-async function reveal(){dealer.hidden=false;dealer.holeEl.classList.add('up');sfx('flip');refresh(dealer);await sleep(600)}
+async function reveal(){dealer.hidden=false;dealer.holeEl.classList.add('up');refresh(dealer);await sleep(600)}
 function nextHand(){while(hands[ai]&&hands[ai].done)ai++;if(ai>=hands.length)dealerTurn();else{busy=false;ui()}}
 async function hit(){const h=hands[ai];if(phase!=='play'||busy||!h||h.done)return;
-  busy=true;ui();await give(h);const t=total(h.cards).t;
+  busy=true;ui();await give(h);await resolveAces(h);const t=total(h.cards).t;
   if(t>21){h.bust=true;h.done=true}else if(t===21)h.done=true;nextHand()}
 function stand(){const h=hands[ai];if(phase!=='play'||busy||!h||h.done)return;h.done=true;nextHand()}
 async function dbl(){const h=hands[ai];if(!(phase==='play'&&!busy&&h&&!h.done&&h.cards.length===2&&bank>=h.bet))return;
-  busy=true;bank-=h.bet;h.bet*=2;sfx('chip');refresh(h);ui();await give(h);
+  busy=true;bank-=h.bet;extra(h.bet,$('bank'));h.bet*=2;refresh(h);ui();await give(h);
   if(total(h.cards).t>21)h.bust=true;h.done=true;nextHand()}
 async function split(){const h=hands[ai];
   if(!(phase==='play'&&!busy&&h&&!h.done&&h.cards.length===2&&pts(h.cards[0])===pts(h.cards[1])&&hands.length<4&&bank>=h.bet))return;
-  busy=true;bank-=h.bet;sfx('chip');
+  busy=true;bank-=h.bet;extra(h.bet,$('bank'));
   const h2=mkHand($('playerHands'),h.bet);h.el.after(h2.el);
   const moved=h.cardsEl.lastElementChild;moved.style.animation='none';h2.cardsEl.appendChild(moved);
-  h2.cards.push(h.cards.pop());hands.splice(ai+1,0,h2);refresh(h);refresh(h2);ui();
-  await sleep(250);await give(h);await give(h2);
+  h2.cards.push(h.cards.pop());hands.splice(ai+1,0,h2);$('playerHands').dataset.n=hands.length;
+  hands.forEach(refresh);ui();
+  await sleep(250);await give(h);await give(h2);await resolveAces(h);await resolveAces(h2);
   for(const x of[h,h2])if(total(x.cards).t===21)x.done=true;
   nextHand()}
 async function dealerTurn(){phase='dealer';busy=true;ui();await reveal();
@@ -228,22 +317,21 @@ function settle(){
   }
   let ttl,cls;
   if(hands.length===1){cls=hands[0].res;
-    ttl={blackjack:'Blackjack!',win:dt>21?'Dealer busts. You win!':'You win!',lose:dbj?'Dealer blackjack':'Dealer wins',push:'Push',bust:'Bust'}[cls]}
-  else{cls=net>0?'win':net<0?'lose':'push';ttl=net>0?'Round won':net<0?'Round lost':'Push'}
-  let sub=net>0?'+'+fmt(net):net<0?'−'+fmt(-net):'Bet returned';
-  if(bank<10)sub+=' · Out of chips';
-  const b=$('banner');b.className='banner '+cls;b.innerHTML=ttl+'<small>'+sub+'</small>';
-  void b.offsetWidth;b.classList.add('show');
-  sfx(cls==='bust'?'lose':cls);ui();
+    ttl={blackjack:'Blackjack!',win:dt>21?'Dealer busts!':'You win!',lose:dbj?'Dealer blackjack':'Dealer wins',push:'Push',bust:'Bust!'}[cls]}
+  else{cls=net>0?'win':net<0?'lose':'push';ttl=net>0?'Round won!':net<0?'Round lost':'Push'}
+  let sub={blackjack:'Pays 3 to 2',win:'Nice hand',lose:'Better luck next hand',bust:'Over 21',push:'Your bet is returned'}[cls];
+  if(bank<10)sub='Out of chips: reset your bankroll';
+  toast(cls,ttl,sub,net);
+  tOut=setTimeout(()=>{$('pile').className='pile'+(net>0?' out-win':net<0?' out-lose':'')},1000);
+  ui();
 }
 function newRound(){if(busy||bank<10)return;clearTable();bet=0;phase='bet';ui()}
 function resetBank(){if(busy)return;bank=1000;bet=0;clearTable();phase='bet';ui()}
 
 /* ---------- Wiring ---------- */
-document.querySelectorAll('.chip').forEach(b=>b.addEventListener('click',()=>addBet(+b.dataset.v)));
-$('clear').onclick=clearBet;$('deal').onclick=deal;$('hit').onclick=hit;$('stand').onclick=stand;
+document.querySelectorAll('.tray .chip').forEach(b=>b.addEventListener('click',()=>addBet(+b.dataset.v,b)));
+$('clear').onclick=clearBet;$('allin').onclick=allIn;$('deal').onclick=deal;$('hit').onclick=hit;$('stand').onclick=stand;
 $('dbl').onclick=dbl;$('split').onclick=split;$('newRound').onclick=newRound;$('reset').onclick=resetBank;
-$('mute').onclick=()=>{muted=!muted;$('mute').textContent=muted?'🔇 Muted':'🔊 Sound';$('mute').setAttribute('aria-pressed',muted);if(!muted)sfx('chip')};
 addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;
   const k=e.key.toLowerCase();if(k==='h')hit();else if(k==='s')stand();else if(k==='d')dbl();else if(k==='p')split()});
 newShoe();ui();
